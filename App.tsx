@@ -20,7 +20,7 @@ const DATA_WORKFORCE: CriteriaData[] = [
             { id: 'wf_2', label: '2. กลุ่มเป้าหมายที่ 1 (ผู้บริหารระดับสูง & หัวหน้ากลุ่มงาน)', description: 'เข้าอบรมใน MOPH Academy หรือหลักสูตรที่กลุ่มงานสุขภาพดิจิทัลจัดขึ้น อย่างน้อย 1 หลักสูตรต่อคน (ครบ 100%)', evidence: 'ใบประกาศนียบัตร (Certificate) ครบทุกคน' },
             { id: 'wf_3', label: '3. กลุ่มเป้าหมายที่ 2 (บุคลากรด้านสุขภาพดิจิทัล/IT)', description: 'เข้าอบรม MOPH Academy (เช่น Cybersecurity, AI) อย่างน้อย 3 หลักสูตรต่อคน (ครบ 100%)', evidence: 'ใบประกาศนียบัตร (Certificate) ครบทุกคน' },
             { id: 'wf_4', label: '4. กลุ่มเป้าหมายที่ 3 (บุคลากรทั่วไป)', description: 'เข้าอบรม MOPH Academy หรือหลักสูตรที่เกี่ยวข้อง อย่างน้อย 1 หลักสูตรต่อคน (ผ่านร้อยละ 80 ของบุคลากรทั้งหมด)', evidence: 'ทะเบียนรายชื่อ หรือรวบรวมใบ Certificate' },
-            { id: 'wf_5', label: '5. นวัตกรรมสุขภาพดิจิทัล', description: 'มีการพัฒนานวัตกรรมสุขภาพดิจิทัล และมีการส่งผลงานร่วมนำเสนอในระดับจังหวัด', evidence: 'เล่มผลงาน หรือหลักฐานการส่งผลงาน' }
+            { id: 'wf_5', label: '5. นวัตกรรมสุขภาพดิจิทัล', description: 'มีการพัฒนานวัตกรรมสุขภาพดิจิทัล ให้ คปสอ.มีอย่างน้อย 1 ผลงาน และมีการส่งผลงานร่วมนำเสนอในระดับจังหวัด', evidence: 'เล่มผลงาน หรือหลักฐานการส่งผลงาน' }
         ]
     }
 ];
@@ -29,10 +29,10 @@ const DATA_APPOINTMENT: CriteriaData[] = [
     {
         id: 'online_appointment',
         label: 'การจัดบริการนัดหมายออนไลน์ (Online Appointment)',
-        description: 'หน่วยบริการจัดให้มีระบบนัดหมายออนไลน์ในคลินิกเป้าหมาย เช่น ทันตกรรม นวดแผนไทย ฝากครรภ์ เป็นต้น',
+        description: 'หน่วยบริการจัดให้มีระบบนัดหมายออนไลน์ในคลินิกเป้าหมาย',
         subItems: [
-            { id: 'appt_1', label: '1. บริการนัดหมายออนไลน์ (รพ.)', description: 'รพ.เปิดให้บริการนัดหมายออนไลน์อย่างน้อย 4 คลินิกเป้าหมาย และเปิด Slot ให้ Walk-in จองได้ไม่น้อยกว่าร้อยละ 10 (6 เดือน) / 20 (12 เดือน)', evidence: 'ภาพหน้าจอระบบนัดหมาย' },
-            { id: 'appt_2', label: '2. บริการนัดหมายออนไลน์ (รพ.สต.)', description: 'รพ.สต.เปิดให้บริการนัดหมายออนไลน์อย่างน้อย 1 คลินิกเป้าหมาย และเปิด Slot ไม่น้อยกว่าร้อยละ 10', evidence: 'ภาพหน้าจอระบบนัดหมาย' }
+            { id: 'appt_1_1', label: '1. คลินิกนัดหมายออนไลน์ (รพ.)', description: 'รพ.เปิดให้บริการนัดหมายออนไลน์อย่างน้อย 4 คลินิกเป้าหมาย', evidence: 'ภาพหน้าจอระบบนัดหมาย' },
+            { id: 'appt_1_2', label: '2. สัดส่วนการจอง Slot (รพ.)', description: 'เปิด Slot ให้ Walk-in จองได้ไม่น้อยกว่าร้อยละ 10 (6 เดือน) / 20 (12 เดือน)', evidence: 'รายงานสรุปการนัดหมาย' }
         ]
     }
 ];
@@ -43,6 +43,7 @@ const DATA_SMART: CriteriaData[] = [
         label: 'แบบประเมินตนเอง Smart รพ.สต. (Smart PCU Assessment)',
         description: 'เพื่อประเมินประสิทธิภาพกระบวนการบริหารจัดการและการให้บริการประชาชน',
         subItems: [
+            { id: 'smart_pcu_plan', label: 'แผนการดำเนินงานขับเคลื่อน Smart รพ.สต.', description: 'มีแผนการดำเนินงานขับเคลื่อนการพัฒนา Smart รพ.สต. ที่ชัดเจน', evidence: 'ไฟล์แผนการดำเนินงาน' },
             { id: 'smart_1_1', label: '1.1 ตัวตนดิจิทัล (Provider ID)', description: 'เจ้าหน้าที่ทุกคนลงทะเบียนและยืนยันตัวตนในระบบ Provider ID ครบ 100%', evidence: 'ภาพหน้าจอ Profile ในระบบ Provider ID' },
             { id: 'smart_1_2', label: '1.2 การสื่อสารองค์กร', description: 'มีกลุ่ม LINE ภายใน และมีช่องทางสื่อสารประชาชน (Page/Line OA)', evidence: 'ภาพหน้าจอแชทกลุ่ม หรือหน้าเพจ' },
             { id: 'smart_1_3', label: '1.3 สารบรรณอิเล็กทรอนิกส์', description: 'ใช้ระบบสารบรรณอิเล็กทรอนิกส์ หรืออีเมลในการรับส่งงานแทนกระดาษ', evidence: 'ภาพหน้าจอการรับ-ส่งหนังสือ' },
@@ -58,15 +59,23 @@ const DATA_SMART: CriteriaData[] = [
         label: 'เกณฑ์มาตรฐาน Smart Hospital (สำหรับ รพ.)',
         description: 'ดำเนินการตามเกณฑ์โรงพยาบาลอัจฉริยะ (Smart Hospital) ครอบคลุมด้าน Infrastructure, Management และ Service',
         subItems: [
-            { id: 'smart_hosp_1', label: 'การประเมินตนเอง (Mandatory Criteria)', description: 'ผ่านเกณฑ์จำเป็นทุกข้อในด้าน Infrastructure, Management และ Service', evidence: 'รายงานผลการประเมิน' }
+            { id: 'smart_hosp_1', label: 'การประเมินตนเอง (Mandatory Criteria)', description: 'ผ่านเกณฑ์จำเป็นทุกข้อในด้าน Infrastructure, Management และ Service และผ่านเกณฑ์ขั้นต่ำระดับทอง', evidence: 'รายงานผลการประเมิน' }
         ]
     }
 ];
 
 const DATA_CYBER: CriteriaData[] = [
     {
+        id: 'hospital_cyber',
+        label: 'เกณฑ์มาตรฐานความมั่นคงปลอดภัยไซเบอร์ (CTAM+) สำหรับ รพ.',
+        description: 'การประเมินความมั่นคงปลอดภัยไซเบอร์ตามมาตรฐาน CTAM+',
+        subItems: [
+            { id: 'ctam_plus_assess', label: 'การประเมินตนเอง (CTAM+)', description: 'รพ. ประเมินตนเองผ่านเกณฑ์มาตรฐานความมั่นคงปลอดภัยไซเบอร์ (CTAM+)', evidence: 'ผลการประเมินจากระบบ' }
+        ]
+    },
+    {
         id: 'cyber_checklist',
-        label: 'แบบประเมินความมั่นคงปลอดภัยไซเบอร์ (Cybersecurity Checklist)',
+        label: 'แบบประเมินความมั่นคงปลอดภัยไซเบอร์ (Cybersecurity Checklist) สำหรับ รพ.สต.',
         description: 'ตรวจสอบความปลอดภัยพื้นฐานของอุปกรณ์และข้อมูล',
         subItems: [
             { id: 'cyber_1_1', label: '1.1 อัปเดตวินโดวส์ (OS Patching)', description: 'คอมพิวเตอร์ใช้งานหลักได้รับการอัปเดต Windows เป็นปัจจุบัน', evidence: 'ภาพหน้าจอ Windows Update' },
@@ -85,8 +94,8 @@ const DATA_RESOURCE: CriteriaData[] = [
         label: 'การเชื่อมต่อข้อมูลระบบ ERP กระทรวง',
         description: 'เชื่อมต่อข้อมูลกับระบบ Enterprise Resources Planning (ERP) ของกระทรวงสาธารณสุข',
         subItems: [
-             { id: 'erp_1', label: 'การเชื่อมต่อ ERP', description: 'เชื่อมต่อข้อมูลครบตามโมดูลที่กำหนด และสถานะเป็นออนไลน์', evidence: 'ภาพหน้าจอสถานะการเชื่อมต่อ' },
-             { id: 'resource_survey', label: 'การรายงานข้อมูลทรัพยากร', description: 'รายงานข้อมูล Hardware, Software, Network, Personnel ครบถ้วน', evidence: 'รายงานจากระบบ' }
+             { id: 'erp_1', label: 'การเชื่อมต่อ ERP (เฉพาะ รพ.)', description: 'เชื่อมต่อข้อมูลครบตามโมดูลที่กำหนด และสถานะเป็นออนไลน์', evidence: 'ภาพหน้าจอสถานะการเชื่อมต่อ' },
+             { id: 'resource_survey', label: 'การรายงานข้อมูลทรัพยากร (ทุกหน่วยงาน)', description: 'รายงานทุกหน่วยงานผ่านการบันทึก บัญชีทรัพย์สินคอมพิวเตอร์ หรือนำเข้าไฟล์ template', evidence: 'รายงานจากระบบ' }
         ]
     }
 ];
