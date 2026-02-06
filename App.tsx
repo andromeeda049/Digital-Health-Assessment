@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Shield, Users, Server, Printer, Plus, Trash2, 
-  Upload, File, X, Building, CalendarCheck, BarChart3, Radio
+  Upload, File, X, Building, CalendarCheck, BarChart3, Radio,
+  LayoutDashboard, Activity, CheckCircle2, AlertCircle, TrendingUp, Info
 } from 'lucide-react';
 import CheckboxItem from './components/CheckboxItem';
 import { 
@@ -100,11 +101,190 @@ const DATA_RESOURCE: CriteriaData[] = [
     }
 ];
 
+// --- Mock Data for Dashboard ---
+const MOCK_DASHBOARD_DATA = {
+    overview: {
+        totalUnits: 12,
+        passedUnits: 8,
+        pendingUnits: 4,
+        avgScore: 82,
+    },
+    byType: [
+        { type: 'รพ.', name: 'โรงพยาบาลประจำอำเภอ', score: 95, status: 'pass' },
+        { type: 'สสอ.', name: 'สำนักงานสาธารณสุขอำเภอ', score: 88, status: 'pass' },
+    ],
+    pcuList: [
+        { name: 'รพ.สต. บ้านควน', score: 92, status: 'pass' },
+        { name: 'รพ.สต. ท่าแพ', score: 85, status: 'pass' },
+        { name: 'รพ.สต. ทุ่งหว้า', score: 78, status: 'pending' },
+        { name: 'รพ.สต. มะนัง', score: 65, status: 'fail' },
+        { name: 'รพ.สต. เกาะสาหร่าย', score: 88, status: 'pass' },
+        { name: 'รพ.สต. ฉลุง', score: 90, status: 'pass' },
+        { name: 'รพ.สต. เจ๊ะบิลัง', score: 70, status: 'pending' },
+        { name: 'รพ.สต. ควนโพธิ์', score: 82, status: 'pass' },
+        { name: 'รพ.สต. ตำมะลัง', score: 60, status: 'fail' },
+        { name: 'รพ.สต. ควนขัน', score: 75, status: 'pending' },
+    ],
+    categoryPerformance: [
+        { label: 'Workforce', value: 85 },
+        { label: 'Appointment', value: 70 },
+        { label: 'Resource & ERP', value: 90 },
+        { label: 'Smart Standards', value: 65 },
+        { label: 'Cybersecurity', value: 75 },
+    ]
+};
+
+const DashboardView = () => {
+    return (
+        <div className="animate-fade-in pb-12">
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold text-slate-800">Dashboard ภาพรวม คปสอ.</h2>
+                <p className="text-slate-500">สถานะการดำเนินงานพัฒนาดิจิทัลสุขภาพระดับเครือข่าย</p>
+            </div>
+
+            {/* Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <Building size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold text-slate-800">{MOCK_DASHBOARD_DATA.overview.totalUnits}</div>
+                        <div className="text-xs text-slate-500 uppercase font-semibold">หน่วยบริการทั้งหมด</div>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center">
+                        <CheckCircle2 size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold text-teal-600">{MOCK_DASHBOARD_DATA.overview.passedUnits}</div>
+                        <div className="text-xs text-slate-500 uppercase font-semibold">ผ่านเกณฑ์</div>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+                        <Activity size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold text-amber-600">{MOCK_DASHBOARD_DATA.overview.pendingUnits}</div>
+                        <div className="text-xs text-slate-500 uppercase font-semibold">รอการประเมิน/แก้ไข</div>
+                    </div>
+                </div>
+                <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                        <TrendingUp size={24} />
+                    </div>
+                    <div>
+                        <div className="text-2xl font-bold text-indigo-600">{MOCK_DASHBOARD_DATA.overview.avgScore}%</div>
+                        <div className="text-xs text-slate-500 uppercase font-semibold">คะแนนเฉลี่ยภาพรวม</div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Left Column: Hospital & SSO & Breakdown */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Hospital & SSO Status */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {MOCK_DASHBOARD_DATA.byType.map((item, idx) => (
+                            <div key={idx} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${item.type === 'รพ.' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'}`}>
+                                            {item.type}
+                                        </span>
+                                        <h3 className="font-bold text-slate-800 mt-2">{item.name}</h3>
+                                    </div>
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.status === 'pass' ? 'bg-teal-100 text-teal-600' : 'bg-rose-100 text-rose-600'}`}>
+                                        {item.status === 'pass' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+                                    </div>
+                                </div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 mb-1">
+                                    <div className="bg-slate-800 h-2 rounded-full" style={{ width: `${item.score}%` }}></div>
+                                </div>
+                                <div className="text-right text-xs text-slate-500">{item.score}% ความพร้อม</div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* PCU List */}
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="p-5 border-b border-slate-100 flex justify-between items-center">
+                            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                                <Building size={18} className="text-slate-400" />
+                                สถานะ รพ.สต. ในเครือข่าย
+                            </h3>
+                            <span className="text-xs font-medium bg-slate-100 text-slate-500 px-2 py-1 rounded-full">{MOCK_DASHBOARD_DATA.pcuList.length} แห่ง</span>
+                        </div>
+                        <div className="divide-y divide-slate-50 max-h-[400px] overflow-y-auto">
+                            {MOCK_DASHBOARD_DATA.pcuList.map((pcu, idx) => (
+                                <div key={idx} className="p-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-2 h-2 rounded-full ${pcu.status === 'pass' ? 'bg-teal-500' : pcu.status === 'fail' ? 'bg-rose-500' : 'bg-amber-400'}`}></div>
+                                        <span className="text-sm font-medium text-slate-700">{pcu.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-24 bg-slate-100 rounded-full h-1.5 hidden sm:block">
+                                            <div 
+                                                className={`h-1.5 rounded-full ${pcu.score >= 80 ? 'bg-teal-500' : pcu.score >= 60 ? 'bg-amber-400' : 'bg-rose-500'}`} 
+                                                style={{ width: `${pcu.score}%` }}
+                                            ></div>
+                                        </div>
+                                        <span className={`text-xs font-bold w-12 text-right ${pcu.score >= 80 ? 'text-teal-600' : pcu.score >= 60 ? 'text-amber-600' : 'text-rose-600'}`}>
+                                            {pcu.score}%
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Column: Category Performance */}
+                <div className="lg:col-span-1">
+                    <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm h-full">
+                        <h3 className="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <BarChart3 size={18} className="text-slate-400" />
+                            ผลการประเมินรายด้าน
+                        </h3>
+                        <div className="space-y-6">
+                            {MOCK_DASHBOARD_DATA.categoryPerformance.map((cat, idx) => (
+                                <div key={idx}>
+                                    <div className="flex justify-between text-xs mb-2">
+                                        <span className="font-medium text-slate-600">{cat.label}</span>
+                                        <span className="font-bold text-slate-800">{cat.value}%</span>
+                                    </div>
+                                    <div className="w-full bg-slate-100 rounded-full h-3">
+                                        <div 
+                                            className="bg-indigo-500 h-3 rounded-full transition-all duration-1000 ease-out" 
+                                            style={{ width: `${cat.value}%`, opacity: 0.7 + (idx * 0.05) }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="mt-8 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                            <h4 className="text-xs font-bold text-slate-500 uppercase mb-2">ข้อเสนอแนะภาพรวม</h4>
+                            <p className="text-xs text-slate-600 leading-relaxed">
+                                ภาพรวม คปสอ. มีความเข้มแข็งด้านทรัพยากรและการเชื่อมต่อข้อมูล (ERP) แต่ยังต้องเร่งพัฒนาด้าน Smart Standards ในระดับ รพ.สต. ให้ผ่านเกณฑ์ขั้นพื้นฐาน และเพิ่มความตระหนักรู้ด้าน Cybersecurity ในบางหน่วยงาน
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const App = () => {
   const [activeTab, setActiveTab] = useState<string>('workforce');
   const [showPrintView, setShowPrintView] = useState<boolean>(false);
+  const [currentView, setCurrentView] = useState<'form' | 'dashboard'>('form'); 
   const [hospitalName, setHospitalName] = useState<string>('');
   const [district, setDistrict] = useState<string>('');
+  const [showCriteria, setShowCriteria] = useState<boolean>(false);
   
   // Helper to initialize state from DATA constants
   const initializeState = (data: CriteriaData[]): AssessmentState => {
@@ -151,7 +331,7 @@ const App = () => {
   // --- Render Sections ---
 
   const renderHeader = () => (
-    <div className="mb-12 pt-8">
+    <div className="mb-8 pt-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -166,36 +346,65 @@ const App = () => {
           <p className="mt-2 text-slate-500 font-light">การขับเคลื่อนการพัฒนาด้านสุขภาพดิจิทัล ประจำปีงบประมาณ 2569</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4">
-            <div className="bg-white px-4 py-2 border border-slate-200 rounded-lg shadow-sm w-full md:w-auto min-w-[200px] focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">หน่วยงาน</label>
-                <input 
-                  type="text" 
-                  className="w-full bg-transparent text-slate-800 text-sm font-medium focus:outline-none placeholder-slate-300"
-                  placeholder="เช่น รพ.สต. ควนโดน"
-                  value={hospitalName}
-                  onChange={(e) => setHospitalName(e.target.value)}
-                />
+        <div className="flex flex-col sm:flex-row gap-4 items-end">
+            {/* View Switcher Buttons */}
+            <div className="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
+                <button 
+                    onClick={() => setCurrentView('form')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${currentView === 'form' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    <File size={16} /> แบบประเมิน
+                </button>
+                <button 
+                    onClick={() => setCurrentView('dashboard')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-2 ${currentView === 'dashboard' ? 'bg-white text-teal-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    <LayoutDashboard size={16} /> Dashboard
+                </button>
             </div>
-             <div className="bg-white px-4 py-2 border border-slate-200 rounded-lg shadow-sm w-full md:w-auto min-w-[150px] focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all">
-                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">อำเภอ</label>
-                <div className="relative">
-                  <select 
-                    className="w-full bg-transparent text-slate-800 text-sm font-medium focus:outline-none cursor-pointer appearance-none pr-4" 
-                    value={district}
-                    onChange={(e) => setDistrict(e.target.value)}
-                  >
-                    <option value="">เลือกอำเภอ</option>
-                    <option value="เมืองสตูล">เมืองสตูล</option>
-                    <option value="ควนโดน">ควนโดน</option>
-                    <option value="ควนกาหลง">ควนกาหลง</option>
-                    <option value="ท่าแพ">ท่าแพ</option>
-                    <option value="ละงู">ละงู</option>
-                    <option value="ทุ่งหว้า">ทุ่งหว้า</option>
-                    <option value="มะนัง">มะนัง</option>
-                  </select>
+            
+            <button
+                onClick={() => setShowCriteria(true)}
+                className="p-2.5 text-slate-500 hover:text-teal-600 hover:bg-slate-100 rounded-lg border border-slate-200 bg-white transition-all flex items-center gap-2 text-sm font-medium"
+                title="เกณฑ์การให้คะแนน"
+            >
+                <Info size={18} /> <span className="hidden sm:inline">เกณฑ์คะแนน</span>
+            </button>
+            
+            {/* Context Inputs - Only show in Form view for clarity, or keep for global context */}
+            {currentView === 'form' && (
+                <div className="flex gap-2">
+                    <div className="bg-white px-4 py-2 border border-slate-200 rounded-lg shadow-sm w-full md:w-auto min-w-[200px] focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">หน่วยงาน</label>
+                        <input 
+                        type="text" 
+                        className="w-full bg-transparent text-slate-800 text-sm font-medium focus:outline-none placeholder-slate-300"
+                        placeholder="เช่น รพ.สต. ควนโดน"
+                        value={hospitalName}
+                        onChange={(e) => setHospitalName(e.target.value)}
+                        />
+                    </div>
+                    <div className="bg-white px-4 py-2 border border-slate-200 rounded-lg shadow-sm w-full md:w-auto min-w-[150px] focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-all">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">อำเภอ</label>
+                        <div className="relative">
+                        <select 
+                            className="w-full bg-transparent text-slate-800 text-sm font-medium focus:outline-none cursor-pointer appearance-none pr-4" 
+                            value={district}
+                            onChange={(e) => setDistrict(e.target.value)}
+                        >
+                            <option value="">เลือกอำเภอ</option>
+                            <option value="เมืองสตูล">เมืองสตูล</option>
+                            <option value="ควนโดน">ควนโดน</option>
+                            <option value="ควนกาหลง">ควนกาหลง</option>
+                            <option value="ท่าแพ">ท่าแพ</option>
+                            <option value="ละงู">ละงู</option>
+                            <option value="ทุ่งหว้า">ทุ่งหว้า</option>
+                            <option value="มะนัง">มะนัง</option>
+                        </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
       </div>
     </div>
@@ -233,6 +442,103 @@ const App = () => {
       </div>
     );
   };
+
+  const renderCriteriaModal = () => {
+    if (!showCriteria) return null;
+    return (
+      <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 animate-fade-in backdrop-blur-sm">
+        <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <Info className="text-teal-600" /> เกณฑ์การให้คะแนน (Scoring Criteria)
+            </h2>
+            <button
+              onClick={() => setShowCriteria(false)}
+              className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500"
+            >
+              <X size={24} />
+            </button>
+          </div>
+          <div className="p-6 space-y-8">
+            {/* Table 1 */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-700 mb-4 border-l-4 border-teal-500 pl-3">
+                1. เกณฑ์การให้คะแนนระดับหน่วยบริการ (รอบ 12 เดือน)
+              </h3>
+              <div className="overflow-x-auto rounded-lg border border-slate-200">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                    <tr>
+                      <th className="px-4 py-3 w-24 text-center">ระดับ</th>
+                      <th className="px-4 py-3">คำอธิบายผลการดำเนินงาน</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {[
+                      { l: 1, d: 'มีแผนฯ และมีกิจกรรมผ่านเกณฑ์ 0-1 กิจกรรม' },
+                      { l: 2, d: 'มีแผนฯ และมีกิจกรรมผ่านเกณฑ์อย่างน้อย 2 กิจกรรม' },
+                      { l: 3, d: 'มีแผนฯ และมีกิจกรรมผ่านเกณฑ์อย่างน้อย 3 กิจกรรม' },
+                      { l: 4, d: 'มีแผนฯ และมีกิจกรรมผ่านเกณฑ์อย่างน้อย 4 กิจกรรม' },
+                      { l: 5, d: 'มีแผนฯ และมีกิจกรรมผ่านเกณฑ์ครบทั้ง 5 กิจกรรม + มีนวัตกรรมสุขภาพดิจิทัลอย่างน้อย 1 เรื่อง' },
+                    ].map((row) => (
+                      <tr key={row.l} className="hover:bg-slate-50/50">
+                        <td className="px-4 py-3 text-center font-bold text-slate-600">ระดับที่ {row.l}</td>
+                        <td className="px-4 py-3 text-slate-600">{row.d}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Table 2 */}
+            <div>
+              <h3 className="text-lg font-bold text-slate-700 mb-4 border-l-4 border-blue-500 pl-3">
+                2. เกณฑ์การให้คะแนนภาพรวม คปสอ. (Scoring)
+              </h3>
+              <p className="text-sm text-slate-500 mb-2">นำ "ร้อยละของหน่วยงานที่ผ่านเกณฑ์" มาเทียบเป็นระดับคะแนน 1-5 ดังนี้</p>
+              <div className="overflow-x-auto rounded-lg border border-slate-200">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                    <tr>
+                      <th className="px-4 py-3 w-24 text-center">ระดับคะแนน</th>
+                      <th className="px-4 py-3">เกณฑ์การผ่าน (ร้อยละของหน่วยงานที่ผ่านเกณฑ์ครบถ้วน)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {[
+                      { s: 5, c: 'หน่วยงานผ่านเกณฑ์ ร้อยละ 100 (ทุกแห่งทำครบทุกข้อ)' },
+                      { s: 4, c: 'หน่วยงานผ่านเกณฑ์ ร้อยละ 90 ขึ้นไป' },
+                      { s: 3, c: 'หน่วยงานผ่านเกณฑ์ ร้อยละ 80 ขึ้นไป' },
+                      { s: 2, c: 'หน่วยงานผ่านเกณฑ์ ร้อยละ 70 ขึ้นไป' },
+                      { s: 1, c: 'หน่วยงานผ่านเกณฑ์ ร้อยละ 60 ขึ้นไป' },
+                    ].map((row) => (
+                      <tr key={row.s} className="hover:bg-slate-50/50">
+                        <td className="px-4 py-3 text-center font-bold text-slate-800 text-lg">{row.s}</td>
+                        <td className="px-4 py-3 text-slate-600">{row.c}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-3 p-3 bg-red-50 border border-red-100 rounded-lg text-red-600 text-sm font-medium flex items-center gap-2">
+                 <AlertCircle size={16} />
+                 หมายเหตุ: หากได้ต่ำกว่าร้อยละ 60 จะได้ 0 คะแนน
+              </div>
+            </div>
+          </div>
+          <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+             <button
+                onClick={() => setShowCriteria(false)}
+                className="px-6 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium"
+             >
+                ปิดหน้าต่าง
+             </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const renderAssetTable = () => (
     <div className="animate-fade-in mt-12 mb-12">
@@ -469,29 +775,38 @@ const App = () => {
       {!showPrintView ? (
         <div className="max-w-5xl mx-auto px-6">
           {renderHeader()}
-          {renderTabs()}
           
-          <div className="min-h-[500px]">
-            {activeTab === 'workforce' && renderGenericForm('Digital Workforce', 'พัฒนาศักยภาพบุคลากรด้านสุขภาพดิจิทัล', DATA_WORKFORCE, workforce, setWorkforce)}
-            {activeTab === 'appointment' && renderGenericForm('Online Appointment', 'ระบบนัดหมายออนไลน์', DATA_APPOINTMENT, appointment, setAppointment)}
-            {activeTab === 'resource' && (
-                <>
-                    {renderGenericForm('Digital Resources & ERP', 'ทรัพยากรสุขภาพดิจิทัลและการเชื่อมต่อข้อมูล', DATA_RESOURCE, resource, setResource)}
-                    {renderAssetTable()}
-                </>
-            )}
-            {activeTab === 'smart' && renderGenericForm('Smart Hospital / Smart PCU', 'เกณฑ์มาตรฐานโรงพยาบาลอัจฉริยะ', DATA_SMART, smartStandard, setSmartStandard)}
-            {activeTab === 'cyber' && renderGenericForm('Cybersecurity Hygiene', 'ความมั่นคงปลอดภัยไซเบอร์ (CTAM+)', DATA_CYBER, cyber, setCyber)}
-          </div>
+          {currentView === 'form' ? (
+              <>
+                {renderTabs()}
+                <div className="min-h-[500px]">
+                    {activeTab === 'workforce' && renderGenericForm('Digital Workforce', 'พัฒนาศักยภาพบุคลากรด้านสุขภาพดิจิทัล', DATA_WORKFORCE, workforce, setWorkforce)}
+                    {activeTab === 'appointment' && renderGenericForm('Online Appointment', 'ระบบนัดหมายออนไลน์', DATA_APPOINTMENT, appointment, setAppointment)}
+                    {activeTab === 'resource' && (
+                        <>
+                            {renderGenericForm('Digital Resources & ERP', 'ทรัพยากรสุขภาพดิจิทัลและการเชื่อมต่อข้อมูล', DATA_RESOURCE, resource, setResource)}
+                            {renderAssetTable()}
+                        </>
+                    )}
+                    {activeTab === 'smart' && renderGenericForm('Smart Hospital / Smart PCU', 'เกณฑ์มาตรฐานโรงพยาบาลอัจฉริยะ', DATA_SMART, smartStandard, setSmartStandard)}
+                    {activeTab === 'cyber' && renderGenericForm('Cybersecurity Hygiene', 'ความมั่นคงปลอดภัยไซเบอร์ (CTAM+)', DATA_CYBER, cyber, setCyber)}
+                </div>
 
-          <div className="fixed bottom-8 right-8 z-50">
-             <button 
-              onClick={() => setShowPrintView(true)}
-              className="flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl hover:bg-teal-600 transition-all font-medium tracking-wide"
-            >
-              <Printer size={20} /> <span className="hidden md:inline">Print Report</span>
-            </button>
-          </div>
+                <div className="fixed bottom-8 right-8 z-50">
+                    <button 
+                    onClick={() => setShowPrintView(true)}
+                    className="flex items-center gap-3 bg-slate-900 text-white px-6 py-4 rounded-full shadow-2xl hover:bg-teal-600 transition-all font-medium tracking-wide"
+                    >
+                    <Printer size={20} /> <span className="hidden md:inline">Print Report</span>
+                    </button>
+                </div>
+              </>
+          ) : (
+              <DashboardView />
+          )}
+          
+          {/* Scoring Criteria Modal */}
+          {renderCriteriaModal()}
         </div>
       ) : (
         <div className="bg-slate-200 min-h-screen p-8 flex flex-col items-center overflow-auto">
