@@ -281,7 +281,7 @@ const DashboardView = () => {
 const App = () => {
   const [activeTab, setActiveTab] = useState<string>('workforce');
   const [showPrintView, setShowPrintView] = useState<boolean>(false);
-  const [currentView, setCurrentView] = useState<'form' | 'dashboard'>('form'); 
+  const [currentView, setCurrentView] = useState<'form' | 'dashboard'>('dashboard'); 
   const [hospitalName, setHospitalName] = useState<string>('');
   const [district, setDistrict] = useState<string>('');
   const [showCriteria, setShowCriteria] = useState<boolean>(false);
