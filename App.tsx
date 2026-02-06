@@ -1,53 +1,125 @@
 import React, { useState } from 'react';
 import { 
   Shield, Users, Server, Printer, Plus, Trash2, 
-  Upload, File, X, Building
+  Upload, File, X, Building, CalendarCheck, BarChart3, Radio
 } from 'lucide-react';
 import CheckboxItem from './components/CheckboxItem';
-import { Asset, AssessmentItem, SmartPCUState, CyberState, PersonnelState } from './types';
+import { 
+  Asset, AssessmentItem, AssessmentState, CriteriaData 
+} from './types';
+
+// --- Data Content Constants (Based on PDF) ---
+
+const DATA_WORKFORCE: CriteriaData[] = [
+    {
+        id: 'workforce_dev',
+        label: 'การพัฒนาศักยภาพบุคลากรด้านสุขภาพดิจิทัล',
+        description: 'ติดตามการจัดตั้งคณะกรรมการและการพัฒนาศักยภาพบุคลากรตามหลักสูตร Digital Health ในระบบ MOPH Academy',
+        subItems: [
+            { id: 'wf_1', label: '1. การจัดตั้งคณะกรรมการ', description: 'มีคำสั่งแต่งตั้ง "คณะกรรมการพัฒนาบุคลากรด้านสุขภาพดิจิทัล" องค์ประกอบ: ผู้บริหาร, HR, แผนงาน, IT, ตัวแทนวิชาชีพ', evidence: 'คำสั่งแต่งตั้ง (PDF)' },
+            { id: 'wf_2', label: '2. กลุ่มเป้าหมายที่ 1 (ผู้บริหารระดับสูง & หัวหน้ากลุ่มงาน)', description: 'เข้าอบรมใน MOPH Academy หรือหลักสูตรที่กลุ่มงานสุขภาพดิจิทัลจัดขึ้น อย่างน้อย 1 หลักสูตรต่อคน (ครบ 100%)', evidence: 'ใบประกาศนียบัตร (Certificate) ครบทุกคน' },
+            { id: 'wf_3', label: '3. กลุ่มเป้าหมายที่ 2 (บุคลากรด้านสุขภาพดิจิทัล/IT)', description: 'เข้าอบรม MOPH Academy (เช่น Cybersecurity, AI) อย่างน้อย 3 หลักสูตรต่อคน (ครบ 100%)', evidence: 'ใบประกาศนียบัตร (Certificate) ครบทุกคน' },
+            { id: 'wf_4', label: '4. กลุ่มเป้าหมายที่ 3 (บุคลากรทั่วไป)', description: 'เข้าอบรม MOPH Academy หรือหลักสูตรที่เกี่ยวข้อง อย่างน้อย 1 หลักสูตรต่อคน (ผ่านร้อยละ 80 ของบุคลากรทั้งหมด)', evidence: 'ทะเบียนรายชื่อ หรือรวบรวมใบ Certificate' },
+            { id: 'wf_5', label: '5. นวัตกรรมสุขภาพดิจิทัล', description: 'มีการพัฒนานวัตกรรมสุขภาพดิจิทัล และมีการส่งผลงานร่วมนำเสนอในระดับจังหวัด', evidence: 'เล่มผลงาน หรือหลักฐานการส่งผลงาน' }
+        ]
+    }
+];
+
+const DATA_APPOINTMENT: CriteriaData[] = [
+    {
+        id: 'online_appointment',
+        label: 'การจัดบริการนัดหมายออนไลน์ (Online Appointment)',
+        description: 'หน่วยบริการจัดให้มีระบบนัดหมายออนไลน์ในคลินิกเป้าหมาย เช่น ทันตกรรม นวดแผนไทย ฝากครรภ์ เป็นต้น',
+        subItems: [
+            { id: 'appt_1', label: '1. บริการนัดหมายออนไลน์ (รพ.)', description: 'รพ.เปิดให้บริการนัดหมายออนไลน์อย่างน้อย 4 คลินิกเป้าหมาย และเปิด Slot ให้ Walk-in จองได้ไม่น้อยกว่าร้อยละ 10 (6 เดือน) / 20 (12 เดือน)', evidence: 'ภาพหน้าจอระบบนัดหมาย' },
+            { id: 'appt_2', label: '2. บริการนัดหมายออนไลน์ (รพ.สต.)', description: 'รพ.สต.เปิดให้บริการนัดหมายออนไลน์อย่างน้อย 1 คลินิกเป้าหมาย และเปิด Slot ไม่น้อยกว่าร้อยละ 10', evidence: 'ภาพหน้าจอระบบนัดหมาย' }
+        ]
+    }
+];
+
+const DATA_SMART: CriteriaData[] = [
+    {
+        id: 'smart_pcu',
+        label: 'แบบประเมินตนเอง Smart รพ.สต. (Smart PCU Assessment)',
+        description: 'เพื่อประเมินประสิทธิภาพกระบวนการบริหารจัดการและการให้บริการประชาชน',
+        subItems: [
+            { id: 'smart_1_1', label: '1.1 ตัวตนดิจิทัล (Provider ID)', description: 'เจ้าหน้าที่ทุกคนลงทะเบียนและยืนยันตัวตนในระบบ Provider ID ครบ 100%', evidence: 'ภาพหน้าจอ Profile ในระบบ Provider ID' },
+            { id: 'smart_1_2', label: '1.2 การสื่อสารองค์กร', description: 'มีกลุ่ม LINE ภายใน และมีช่องทางสื่อสารประชาชน (Page/Line OA)', evidence: 'ภาพหน้าจอแชทกลุ่ม หรือหน้าเพจ' },
+            { id: 'smart_1_3', label: '1.3 สารบรรณอิเล็กทรอนิกส์', description: 'ใช้ระบบสารบรรณอิเล็กทรอนิกส์ หรืออีเมลในการรับส่งงานแทนกระดาษ', evidence: 'ภาพหน้าจอการรับ-ส่งหนังสือ' },
+            { id: 'smart_1_4', label: '1.4 นโยบาย PDPA', description: 'มีประกาศนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA Policy) เป็นลายลักษณ์อักษร', evidence: 'ไฟล์ประกาศนโยบายที่ลงนามแล้ว' },
+            { id: 'smart_2_1', label: '2.1 ยืนยันตัวตน (Authen)', description: 'ใช้เครื่อง Smart Card Reader เสียบยืนยันตัวตนผู้ป่วย (Authen Code) ทุกราย', evidence: 'ภาพถ่ายขณะเสียบบัตร ปชช. ให้บริการ' },
+            { id: 'smart_2_2', label: '2.2 นัดหมาย & คิว', description: 'มีระบบรับนัดหมายล่วงหน้า (Line/โทร) และเตรียมแฟ้มประวัติไว้ก่อน', evidence: 'ภาพสมุดนัด หรือแชทการนัดหมาย' },
+            { id: 'smart_2_3', label: '2.3 แพทย์ทางไกล (Telemedicine)', description: 'มีจุด/อุปกรณ์ พร้อม Video Call ปรึกษาแพทย์ รพ.แม่ข่ายได้ทันทีเมื่อจำเป็น', evidence: 'ภาพถ่ายจุดให้บริการ Telemedicine' },
+            { id: 'smart_2_4', label: '2.4 เยี่ยมบ้าน/ส่งยา', description: 'ใช้ App บันทึกข้อมูลเยี่ยมบ้าน หรือมีระบบส่งยาให้ผู้ป่วย', evidence: 'ภาพหน้าจอ App หรือภาพการส่งยา' }
+        ]
+    },
+    {
+        id: 'smart_hospital',
+        label: 'เกณฑ์มาตรฐาน Smart Hospital (สำหรับ รพ.)',
+        description: 'ดำเนินการตามเกณฑ์โรงพยาบาลอัจฉริยะ (Smart Hospital) ครอบคลุมด้าน Infrastructure, Management และ Service',
+        subItems: [
+            { id: 'smart_hosp_1', label: 'การประเมินตนเอง (Mandatory Criteria)', description: 'ผ่านเกณฑ์จำเป็นทุกข้อในด้าน Infrastructure, Management และ Service', evidence: 'รายงานผลการประเมิน' }
+        ]
+    }
+];
+
+const DATA_CYBER: CriteriaData[] = [
+    {
+        id: 'cyber_checklist',
+        label: 'แบบประเมินความมั่นคงปลอดภัยไซเบอร์ (Cybersecurity Checklist)',
+        description: 'ตรวจสอบความปลอดภัยพื้นฐานของอุปกรณ์และข้อมูล',
+        subItems: [
+            { id: 'cyber_1_1', label: '1.1 อัปเดตวินโดวส์ (OS Patching)', description: 'คอมพิวเตอร์ใช้งานหลักได้รับการอัปเดต Windows เป็นปัจจุบัน', evidence: 'ภาพหน้าจอ Windows Update' },
+            { id: 'cyber_1_2', label: '1.2 ป้องกันไวรัส (Antivirus)', description: 'ทุกเครื่องมี Antivirus (หรือ Windows Defender) เปิดใช้งาน สถานะสีเขียว', evidence: 'ภาพหน้าจอ Antivirus' },
+            { id: 'cyber_1_3', label: '1.3 ซอฟต์แวร์ (Software)', description: 'โปรแกรมสำคัญ (JHCIS/HosXP, Browser) เป็นเวอร์ชันล่าสุดเสมอ', evidence: 'ภาพหน้าจอ About ของโปรแกรม' },
+            { id: 'cyber_2_1', label: '2.1 การสำรองข้อมูล (Backup)', description: 'สำรองข้อมูลใส่ External HDD และถอดเก็บแยกทันทีหลังทำเสร็จ (Offline)', evidence: 'ภาพถ่ายอุปกรณ์ที่ถอดวางไว้' },
+            { id: 'cyber_2_2', label: '2.2 ความเป็นส่วนตัว (Privacy)', description: 'ไม่มีการแปะกระดาษจดรหัสผ่าน (Password) ไว้ที่หน้าจอ/ใต้คีย์บอร์ด', evidence: 'ภาพถ่ายหน้าจอคอมพิวเตอร์' },
+            { id: 'cyber_3_1', label: '3.1 อินเทอร์เน็ตสำรอง', description: 'มีแนวทาง/อุปกรณ์สำรอง (เช่น Hotspot มือถือ) หากเน็ตหลักล่ม', evidence: 'ภาพถ่ายการทดสอบเน็ตสำรอง' }
+        ]
+    }
+];
+
+const DATA_RESOURCE: CriteriaData[] = [
+    {
+        id: 'erp_connect',
+        label: 'การเชื่อมต่อข้อมูลระบบ ERP กระทรวง',
+        description: 'เชื่อมต่อข้อมูลกับระบบ Enterprise Resources Planning (ERP) ของกระทรวงสาธารณสุข',
+        subItems: [
+             { id: 'erp_1', label: 'การเชื่อมต่อ ERP', description: 'เชื่อมต่อข้อมูลครบตามโมดูลที่กำหนด และสถานะเป็นออนไลน์', evidence: 'ภาพหน้าจอสถานะการเชื่อมต่อ' },
+             { id: 'resource_survey', label: 'การรายงานข้อมูลทรัพยากร', description: 'รายงานข้อมูล Hardware, Software, Network, Personnel ครบถ้วน', evidence: 'รายงานจากระบบ' }
+        ]
+    }
+];
 
 const App = () => {
-  const [activeTab, setActiveTab] = useState<string>('assets');
+  const [activeTab, setActiveTab] = useState<string>('workforce');
   const [showPrintView, setShowPrintView] = useState<boolean>(false);
   const [hospitalName, setHospitalName] = useState<string>('');
   const [district, setDistrict] = useState<string>('');
   
-  const createItem = (): AssessmentItem => ({ status: null, fileName: null });
+  // Helper to initialize state from DATA constants
+  const initializeState = (data: CriteriaData[]): AssessmentState => {
+    const initialState: AssessmentState = {};
+    data.forEach(group => {
+      group.subItems.forEach(sub => {
+        initialState[sub.id] = { status: null, fileName: null };
+      });
+    });
+    return initialState;
+  };
 
-  // State Definitions
+  // --- State Definitions ---
   const [assets, setAssets] = useState<Asset[]>([
     { id: 1, code: '', type: 'PC', user: '', spec: '', status: 'normal', fileName: null }
   ]);
 
-  const [smartPCU, setSmartPCU] = useState<SmartPCUState>({
-    providerId: createItem(),
-    communication: createItem(),
-    edoc: createItem(),
-    pdpa: createItem(),
-    authen: createItem(),
-    appointment: createItem(),
-    telemed: createItem(),
-    homeWard: createItem()
-  });
+  const [workforce, setWorkforce] = useState<AssessmentState>(initializeState(DATA_WORKFORCE));
+  const [appointment, setAppointment] = useState<AssessmentState>(initializeState(DATA_APPOINTMENT));
+  const [resource, setResource] = useState<AssessmentState>(initializeState(DATA_RESOURCE));
+  const [smartStandard, setSmartStandard] = useState<AssessmentState>(initializeState(DATA_SMART));
+  const [cyber, setCyber] = useState<AssessmentState>(initializeState(DATA_CYBER));
 
-  const [cyber, setCyber] = useState<CyberState>({
-    osPatch: createItem(),
-    antivirus: createItem(),
-    software: createItem(),
-    backup: createItem(),
-    privacy: createItem(),
-    internetBackup: createItem()
-  });
-
-  const [personnel, setPersonnel] = useState<PersonnelState>({
-    committee: createItem(),
-    executives: createItem(),
-    itStaff: createItem(),
-    generalStaff: createItem(),
-    innovation: createItem()
-  });
-
-  // --- Handlers ---
+  // --- Asset Handlers ---
   const handleAssetChange = (id: number, field: keyof Asset, value: any) => {
     setAssets(assets.map(asset => asset.id === id ? { ...asset, [field]: value } : asset));
   };
@@ -122,14 +194,15 @@ const App = () => {
 
   const renderTabs = () => {
     const tabs = [
-      { id: 'assets', label: 'บัญชีทรัพย์สิน', icon: Server },
-      { id: 'smart', label: 'Smart PCU', icon: File },
-      { id: 'cyber', label: 'Cybersecurity', icon: Shield },
-      { id: 'personnel', label: 'บุคลากร', icon: Users },
+      { id: 'workforce', label: '1. Digital Workforce', icon: Users },
+      { id: 'appointment', label: '2. นัดหมายออนไลน์', icon: CalendarCheck },
+      { id: 'resource', label: '3. ทรัพยากร & ERP', icon: BarChart3 },
+      { id: 'smart', label: '4. Smart Standards', icon: Radio },
+      { id: 'cyber', label: '5. Cybersecurity', icon: Shield },
     ];
 
     return (
-      <div className="flex flex-wrap gap-2 mb-10 no-print border-b border-slate-200 pb-1">
+      <div className="flex flex-wrap gap-2 mb-8 no-print border-b border-slate-200 pb-1">
         {tabs.map(tab => {
           const isActive = activeTab === tab.id;
           
@@ -137,7 +210,7 @@ const App = () => {
             <button 
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-t-lg text-sm font-medium transition-all relative top-[1px] ${
+              className={`flex items-center gap-2 px-4 py-3 rounded-t-lg text-sm font-medium transition-all relative top-[1px] ${
                 isActive 
                   ? 'text-teal-700 border-b-2 border-teal-600 bg-teal-50/50' 
                   : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
@@ -153,7 +226,7 @@ const App = () => {
   };
 
   const renderAssetTable = () => (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in mt-12 mb-12">
       <div className="flex justify-between items-end mb-6">
         <div>
            <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">Asset Inventory</span>
@@ -246,123 +319,63 @@ const App = () => {
           </table>
         </div>
       </div>
-      {assets.length === 0 && (
-          <div className="p-12 text-center border border-dashed border-slate-300 rounded-xl mt-4">
-              <p className="text-slate-400">ยังไม่มีรายการทรัพย์สิน</p>
-          </div>
-      )}
     </div>
   );
 
-  const renderSmartForm = () => (
-    <div className="animate-fade-in max-w-4xl mx-auto">
+  const renderGenericForm = (
+    title: string, 
+    subtitle: string, 
+    data: CriteriaData[],
+    stateObj: AssessmentState,
+    setStateObj: React.Dispatch<React.SetStateAction<AssessmentState>>
+  ) => (
+    <div className="animate-fade-in max-w-5xl mx-auto">
       <div className="mb-10 text-center">
-        <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">Assessment Part 2</span>
-        <h2 className="text-3xl font-light text-slate-900 mt-2">Smart PCU</h2>
-        <p className="text-slate-500 mt-2 font-light">การบริหารจัดการและการบริการด้วยเทคโนโลยีดิจิทัล</p>
+        <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">Assessment Activity</span>
+        <h2 className="text-3xl font-light text-slate-900 mt-2">{title}</h2>
+        <p className="text-slate-500 mt-2 font-light">{subtitle}</p>
       </div>
       
-      <div className="space-y-12">
-        <section>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-4 pl-4 border-l-4 border-teal-500">การบริหารจัดการ</h3>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-2">
-            <CheckboxItem<SmartPCUState> label="1.1 ตัวตนดิจิทัล (Provider ID) ครบ 100%" stateKey="providerId" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ภาพหน้าจอ Profile ในระบบ" />
-            <CheckboxItem<SmartPCUState> label="1.2 การสื่อสารองค์กร (Line กลุ่ม/Page/OA)" stateKey="communication" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ภาพหน้าจอแชทกลุ่ม" />
-            <CheckboxItem<SmartPCUState> label="1.3 ระบบสารบรรณอิเล็กทรอนิกส์/Email" stateKey="edoc" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ภาพหน้าจอการรับ-ส่งหนังสือ" />
-            <CheckboxItem<SmartPCUState> label="1.4 นโยบาย PDPA (มีประกาศลงนาม)" stateKey="pdpa" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ไฟล์ประกาศนโยบาย" />
-          </div>
-        </section>
-
-        <section>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-4 pl-4 border-l-4 border-teal-500">การบริการ</h3>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-2">
-            <CheckboxItem<SmartPCUState> label="2.1 ยืนยันตัวตนผู้ป่วย (Smart Card Authen)" stateKey="authen" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ภาพถ่ายขณะเสียบบัตร" />
-            <CheckboxItem<SmartPCUState> label="2.2 ระบบนัดหมาย & คิวออนไลน์" stateKey="appointment" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ภาพสมุดนัด/แชท" />
-            <CheckboxItem<SmartPCUState> label="2.3 แพทย์ทางไกล (Telemedicine)" stateKey="telemed" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ภาพถ่ายจุดให้บริการ" />
-            <CheckboxItem<SmartPCUState> label="2.4 เยี่ยมบ้าน/ส่งยา (Digital Home Ward)" stateKey="homeWard" stateObj={smartPCU} setStateObj={setSmartPCU} evidence="ภาพหน้าจอ App" />
-          </div>
-        </section>
+      <div>
+        {data.map((item) => (
+            <React.Fragment key={item.id}>
+              <CheckboxItem
+                  data={item}
+                  stateObj={stateObj}
+                  setStateObj={setStateObj}
+              />
+            </React.Fragment>
+        ))}
       </div>
     </div>
   );
 
-  const renderCyberForm = () => (
-    <div className="animate-fade-in max-w-4xl mx-auto">
-      <div className="mb-10 text-center">
-        <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">Assessment Part 3</span>
-        <h2 className="text-3xl font-light text-slate-900 mt-2">Cybersecurity Hygiene</h2>
-        <p className="text-slate-500 mt-2 font-light">ความปลอดภัยทางไซเบอร์ขั้นพื้นฐาน</p>
-      </div>
-      
-      <div className="space-y-12">
-        <section>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-4 pl-4 border-l-4 border-teal-500">ความปลอดภัยอุปกรณ์</h3>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-2">
-            <CheckboxItem<CyberState> label="1.1 อัปเดต Windows เป็นปัจจุบัน" stateKey="osPatch" stateObj={cyber} setStateObj={setCyber} evidence="ภาพหน้าจอ Update" />
-            <CheckboxItem<CyberState> label="1.2 ติดตั้งและเปิดใช้งาน Antivirus" stateKey="antivirus" stateObj={cyber} setStateObj={setCyber} evidence="ภาพหน้าจอ Antivirus" />
-            <CheckboxItem<CyberState> label="1.3 ซอฟต์แวร์ถูกกฎหมายและอัปเดต" stateKey="software" stateObj={cyber} setStateObj={setCyber} evidence="ภาพหน้าจอ About" />
-          </div>
-        </section>
-
-        <section>
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-4 pl-4 border-l-4 border-teal-500">ข้อมูล & เครือข่าย</h3>
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-2">
-            <CheckboxItem<CyberState> label="2.1 สำรองข้อมูล (Backup) และถอดเก็บแยก" stateKey="backup" stateObj={cyber} setStateObj={setCyber} evidence="ภาพถ่ายอุปกรณ์ Backup" />
-            <CheckboxItem<CyberState> label="2.2 ไม่แปะรหัสผ่านหน้าจอคอมพิวเตอร์" stateKey="privacy" stateObj={cyber} setStateObj={setCyber} evidence="ภาพถ่ายหน้าจอคอม" />
-            <CheckboxItem<CyberState> label="3.1 มีอินเทอร์เน็ตสำรอง (Hotspot)" stateKey="internetBackup" stateObj={cyber} setStateObj={setCyber} evidence="ภาพถ่าย Speedtest" />
-          </div>
-        </section>
-      </div>
-    </div>
+  // Helper for print view mapping
+  const renderPrintSection = (title: string, data: CriteriaData[], stateObj: AssessmentState) => (
+      <section>
+        <h3 className="font-bold text-slate-900 border-l-4 border-teal-600 pl-3 mb-4 text-sm">{title}</h3>
+        <ul className="text-xs space-y-2">
+            {data.map(group => (
+                <li key={group.id} className="mb-3">
+                    <div className="font-semibold text-slate-700 mb-1">{group.label}</div>
+                    <ul className="pl-4 space-y-1 border-l border-slate-200 ml-1">
+                        {group.subItems.map(sub => {
+                            const status = stateObj[sub.id]?.status;
+                            return (
+                                <li key={sub.id} className="flex justify-between items-start">
+                                    <span className="text-slate-600 w-3/4">{sub.label}</span>
+                                    <span className={status === 'pass' ? 'text-teal-600 font-bold' : status === 'fail' ? 'text-rose-500' : 'text-slate-300'}>
+                                        {status === 'pass' ? 'ผ่าน' : status === 'fail' ? 'ไม่ผ่าน' : '-'}
+                                    </span>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                </li>
+            ))}
+        </ul>
+    </section>
   );
-
-  const renderPersonnelForm = () => {
-    const personnelValues = Object.values(personnel);
-    
-    // Logic for summary
-    const trainingPassed = (personnel.executives.status === 'pass' ? 1 : 0) + 
-                           (personnel.itStaff.status === 'pass' ? 1 : 0) + 
-                           (personnel.generalStaff.status === 'pass' ? 1 : 0);
-    
-    const pass9Months = trainingPassed >= 2; 
-    const pass12Months = (trainingPassed + (personnel.innovation.status === 'pass' ? 1 : 0)) >= 3;
-
-    return (
-      <div className="animate-fade-in max-w-4xl mx-auto">
-        <div className="mb-10 text-center">
-            <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">Assessment Part 4</span>
-            <h2 className="text-3xl font-light text-slate-900 mt-2">Digital Workforce</h2>
-            <p className="text-slate-500 mt-2 font-light">การพัฒนาศักยภาพบุคลากร</p>
-        </div>
-        
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-2 mb-8">
-            <CheckboxItem<PersonnelState> label="1. คำสั่งแต่งตั้งคณะกรรมการพัฒนาบุคลากรฯ" stateKey="committee" stateObj={personnel} setStateObj={setPersonnel} evidence="ไฟล์คำสั่ง (PDF)" />
-            <CheckboxItem<PersonnelState> label="2. ผู้บริหาร/หัวหน้ากลุ่มงาน อบรมครบ 100%" stateKey="executives" stateObj={personnel} setStateObj={setPersonnel} evidence="ใบประกาศนียบัตร" />
-            <CheckboxItem<PersonnelState> label="3. จนท. IT/Digital Health อบรมครบ 100%" stateKey="itStaff" stateObj={personnel} setStateObj={setPersonnel} evidence="ใบประกาศนียบัตร" />
-            <CheckboxItem<PersonnelState> label="4. บุคลากรทั่วไป อบรมผ่านเกณฑ์ 80%" stateKey="generalStaff" stateObj={personnel} setStateObj={setPersonnel} evidence="ทะเบียนรายชื่อ" />
-            <CheckboxItem<PersonnelState> label="5. มีผลงานนวัตกรรมสุขภาพดิจิทัล" stateKey="innovation" stateObj={personnel} setStateObj={setPersonnel} evidence="รูปเล่มผลงาน" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className={`p-6 rounded-xl border transition-all ${pass9Months ? 'bg-teal-50/50 border-teal-100 shadow-sm' : 'bg-slate-50 border-slate-100'}`}>
-              <div className="flex items-center gap-3 mb-2">
-                 <div className={`w-2 h-2 rounded-full ${pass9Months ? 'bg-teal-500' : 'bg-slate-300'}`}></div>
-                 <span className={`text-sm font-bold uppercase tracking-wide ${pass9Months ? 'text-teal-700' : 'text-slate-400'}`}>เกณฑ์รอบ 9 เดือน</span>
-              </div>
-              <p className="text-slate-500 text-sm pl-5">ผ่าน 2 ใน 3 ข้อเรื่องอบรม</p>
-            </div>
-            
-            <div className={`p-6 rounded-xl border transition-all ${pass12Months ? 'bg-teal-50/50 border-teal-100 shadow-sm' : 'bg-slate-50 border-slate-100'}`}>
-               <div className="flex items-center gap-3 mb-2">
-                 <div className={`w-2 h-2 rounded-full ${pass12Months ? 'bg-teal-500' : 'bg-slate-300'}`}></div>
-                 <span className={`text-sm font-bold uppercase tracking-wide ${pass12Months ? 'text-teal-700' : 'text-slate-400'}`}>เกณฑ์รอบ 12 เดือน</span>
-              </div>
-              <p className="text-slate-500 text-sm pl-5">ผ่าน 3 ใน 4 ข้อรวมนวัตกรรม</p>
-            </div>
-        </div>
-      </div>
-    );
-  };
 
   const renderPrintView = () => (
     <div className="bg-white p-12 w-full mx-auto print-content text-slate-800 font-sarabun h-full">
@@ -393,9 +406,16 @@ const App = () => {
          </div>
       </div>
 
-      <div className="space-y-10">
-        <section>
-            <h3 className="font-bold text-slate-900 border-l-4 border-slate-800 pl-3 mb-4">1. บัญชีทรัพย์สิน ({assets.length})</h3>
+      <div className="space-y-8">
+        {renderPrintSection('1. Digital Workforce', DATA_WORKFORCE, workforce)}
+        {renderPrintSection('2. ระบบนัดหมายออนไลน์', DATA_APPOINTMENT, appointment)}
+        {renderPrintSection('3. ทรัพยากรสุขภาพดิจิทัล & ERP', DATA_RESOURCE, resource)}
+        {renderPrintSection('4. เกณฑ์มาตรฐาน Smart Hospital/PCU', DATA_SMART, smartStandard)}
+        {renderPrintSection('5. ความมั่นคงปลอดภัยไซเบอร์ (Cybersecurity)', DATA_CYBER, cyber)}
+        
+        {/* Assets */}
+         <section>
+            <h3 className="font-bold text-slate-900 border-l-4 border-slate-800 pl-3 mb-4 text-sm">บัญชีทรัพย์สิน ({assets.length})</h3>
             <table className="w-full text-xs text-left border-collapse">
                 <thead>
                     <tr className="border-b border-slate-200 text-slate-500">
@@ -420,48 +440,6 @@ const App = () => {
             </table>
         </section>
 
-        <section className="grid grid-cols-2 gap-8">
-            <div>
-                <h3 className="font-bold text-slate-900 border-l-4 border-teal-600 pl-3 mb-4">2. Smart PCU</h3>
-                <ul className="text-xs space-y-2">
-                    {Object.entries(smartPCU).map(([key, val]) => {
-                        const item = val as AssessmentItem;
-                        return (
-                        <li key={key} className="flex justify-between border-b border-slate-50 pb-1">
-                           <span className="text-slate-600 capitalize">{key}</span>
-                           <span className={item.status === 'pass' ? 'text-teal-600 font-bold' : 'text-slate-300'}>{item.status === 'pass' ? 'ผ่าน' : item.status === 'fail' ? 'ไม่ผ่าน' : '-'}</span>
-                        </li>
-                    )})}
-                </ul>
-            </div>
-             <div>
-                <h3 className="font-bold text-slate-900 border-l-4 border-teal-600 pl-3 mb-4">3. Cybersecurity</h3>
-                <ul className="text-xs space-y-2">
-                    {Object.entries(cyber).map(([key, val]) => {
-                        const item = val as AssessmentItem;
-                        return (
-                        <li key={key} className="flex justify-between border-b border-slate-50 pb-1">
-                           <span className="text-slate-600 capitalize">{key}</span>
-                           <span className={item.status === 'pass' ? 'text-teal-600 font-bold' : 'text-slate-300'}>{item.status === 'pass' ? 'ผ่าน' : item.status === 'fail' ? 'ไม่ผ่าน' : '-'}</span>
-                        </li>
-                    )})}
-                </ul>
-            </div>
-        </section>
-
-        <section>
-          <h3 className="font-bold text-slate-900 border-l-4 border-teal-600 pl-3 mb-4">4. Digital Workforce</h3>
-            <ul className="text-xs space-y-2">
-                {Object.entries(personnel).map(([key, val]) => {
-                    const item = val as AssessmentItem;
-                    return (
-                    <li key={key} className="flex justify-between border-b border-slate-50 pb-1">
-                        <span className="text-slate-600 capitalize">{key}</span>
-                        <span className={item.status === 'pass' ? 'text-teal-600 font-bold' : 'text-slate-300'}>{item.status === 'pass' ? 'ผ่าน' : item.status === 'fail' ? 'ไม่ผ่าน' : '-'}</span>
-                    </li>
-                )})}
-            </ul>
-        </section>
       </div>
 
       <div className="mt-20 pt-8 border-t border-slate-100 flex justify-between px-10 text-center text-sm">
@@ -485,10 +463,16 @@ const App = () => {
           {renderTabs()}
           
           <div className="min-h-[500px]">
-            {activeTab === 'assets' && renderAssetTable()}
-            {activeTab === 'smart' && renderSmartForm()}
-            {activeTab === 'cyber' && renderCyberForm()}
-            {activeTab === 'personnel' && renderPersonnelForm()}
+            {activeTab === 'workforce' && renderGenericForm('Digital Workforce', 'พัฒนาศักยภาพบุคลากรด้านสุขภาพดิจิทัล', DATA_WORKFORCE, workforce, setWorkforce)}
+            {activeTab === 'appointment' && renderGenericForm('Online Appointment', 'ระบบนัดหมายออนไลน์', DATA_APPOINTMENT, appointment, setAppointment)}
+            {activeTab === 'resource' && (
+                <>
+                    {renderGenericForm('Digital Resources & ERP', 'ทรัพยากรสุขภาพดิจิทัลและการเชื่อมต่อข้อมูล', DATA_RESOURCE, resource, setResource)}
+                    {renderAssetTable()}
+                </>
+            )}
+            {activeTab === 'smart' && renderGenericForm('Smart Hospital / Smart PCU', 'เกณฑ์มาตรฐานโรงพยาบาลอัจฉริยะ', DATA_SMART, smartStandard, setSmartStandard)}
+            {activeTab === 'cyber' && renderGenericForm('Cybersecurity Hygiene', 'ความมั่นคงปลอดภัยไซเบอร์ (CTAM+)', DATA_CYBER, cyber, setCyber)}
           </div>
 
           <div className="fixed bottom-8 right-8 z-50">

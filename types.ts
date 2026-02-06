@@ -13,33 +13,27 @@ export interface Asset {
   fileName: string | null;
 }
 
-export interface SmartPCUState {
-  providerId: AssessmentItem;
-  communication: AssessmentItem;
-  edoc: AssessmentItem;
-  pdpa: AssessmentItem;
-  authen: AssessmentItem;
-  appointment: AssessmentItem;
-  telemed: AssessmentItem;
-  homeWard: AssessmentItem;
-  [key: string]: AssessmentItem; // Index signature for dynamic access
+export interface SubCriteria {
+  id: string;
+  label: string;
+  description?: string;
+  evidence?: string;
 }
 
-export interface CyberState {
-  osPatch: AssessmentItem;
-  antivirus: AssessmentItem;
-  software: AssessmentItem;
-  backup: AssessmentItem;
-  privacy: AssessmentItem;
-  internetBackup: AssessmentItem;
-  [key: string]: AssessmentItem;
+// Updated Data structure
+export interface CriteriaData {
+  id: string;
+  label: string;
+  description: string; // Group description / instruction
+  subItems: SubCriteria[];
 }
 
-export interface PersonnelState {
-  committee: AssessmentItem;
-  executives: AssessmentItem;
-  itStaff: AssessmentItem;
-  generalStaff: AssessmentItem;
-  innovation: AssessmentItem;
-  [key: string]: AssessmentItem;
-}
+// Generic State interface
+export type AssessmentState = Record<string, AssessmentItem>;
+
+// Specific interfaces kept for compatibility if needed, but AssessmentState covers them
+export type WorkforceState = AssessmentState;
+export type AppointmentState = AssessmentState;
+export type ResourceState = AssessmentState;
+export type SmartStandardState = AssessmentState;
+export type CyberState = AssessmentState;
